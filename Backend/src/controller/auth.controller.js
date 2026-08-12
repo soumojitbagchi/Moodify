@@ -1,5 +1,5 @@
 import userData from "../model/userSchema.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
@@ -13,12 +13,12 @@ export const registerUser = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
     // Create a new user
     const newUser = new userData({
       name,
       email,
-      password: newUser.password,
+      password: hashedPassword,
       username,
     });
     const token = jwt.sign({ id: newUser._id , email: newUser.email }, process.env.JWT_SECRET, { expiresIn: "1h" });

@@ -1,0 +1,512 @@
+/* ========================================
+   Moodify - Authentication Pages Styles
+   Glassmorphic cards, equalizer, music notes
+   ======================================== */
+
+/* ---- Page Layout ---- */
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ---- Animated Background ---- */
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Gradient orbs */
+.auth-bg .orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.auth-bg .orb-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  top: -10%;
+  left: -5%;
+  animation-delay: 0s;
+}
+
+.auth-bg .orb-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #6d28d9 0%, transparent 70%);
+  bottom: -10%;
+  right: -5%;
+  animation-delay: -3s;
+}
+
+.auth-bg .orb-3 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -5s;
+  opacity: 0.2;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+/* ---- Floating Music Notes ---- */
+.floating-notes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floating-notes .note {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0;
+  animation: noteFloat 12s linear infinite;
+  color: var(--accent-primary);
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.floating-notes .note:nth-child(1) {
+  left: 10%;
+  animation-delay: 0s;
+  font-size: 20px;
+}
+.floating-notes .note:nth-child(2) {
+  left: 25%;
+  animation-delay: -2s;
+  font-size: 28px;
+}
+.floating-notes .note:nth-child(3) {
+  left: 40%;
+  animation-delay: -4s;
+  font-size: 18px;
+}
+.floating-notes .note:nth-child(4) {
+  left: 55%;
+  animation-delay: -6s;
+  font-size: 32px;
+}
+.floating-notes .note:nth-child(5) {
+  left: 70%;
+  animation-delay: -8s;
+  font-size: 22px;
+}
+.floating-notes .note:nth-child(6) {
+  left: 85%;
+  animation-delay: -10s;
+  font-size: 26px;
+}
+.floating-notes .note:nth-child(7) {
+  left: 15%;
+  animation-delay: -1s;
+  font-size: 16px;
+}
+.floating-notes .note:nth-child(8) {
+  left: 60%;
+  animation-delay: -7s;
+  font-size: 30px;
+}
+
+@keyframes noteFloat {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.25;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ---- Glassmorphic Card ---- */
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 24px;
+  border: 1px solid var(--border-subtle);
+  padding: 48px 40px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Card top glow line */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 0 0 2px 2px;
+  opacity: 0.8;
+}
+
+/* ---- Equalizer ---- */
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  margin-bottom: 8px;
+}
+
+.equalizer .bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--gradient-primary);
+  animation: equalize 1.2s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.equalizer .bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+.equalizer .bar:nth-child(2) { height: 30px; animation-delay: -0.2s; }
+.equalizer .bar:nth-child(3) { height: 16px; animation-delay: -0.4s; }
+.equalizer .bar:nth-child(4) { height: 36px; animation-delay: -0.6s; }
+.equalizer .bar:nth-child(5) { height: 24px; animation-delay: -0.8s; }
+.equalizer .bar:nth-child(6) { height: 32px; animation-delay: -0.3s; }
+.equalizer .bar:nth-child(7) { height: 18px; animation-delay: -0.5s; }
+
+@keyframes equalize {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+/* ---- Header ---- */
+.auth-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.auth-logo {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.auth-title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 16px;
+}
+
+/* ---- Profile Picture Placeholder ---- */
+.profile-pic-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 2px dashed var(--border-glow);
+  color: var(--accent-secondary);
+  font-size: 36px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-pic-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-smooth);
+}
+
+.profile-pic-placeholder:hover {
+  border-color: var(--accent-primary);
+  transform: scale(1.05);
+}
+
+.profile-pic-placeholder:hover::after {
+  opacity: 0.1;
+}
+
+.profile-pic-placeholder .icon {
+  z-index: 1;
+}
+
+.profile-pic-label {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* ---- Form ---- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Input group */
+.input-group {
+  position: relative;
+}
+
+.input-group .input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 18px;
+  transition: color 0.3s var(--ease-smooth);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: 14px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.input-group input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-input-focus);
+  background: rgba(30, 30, 55, 0.8);
+}
+
+.input-group input:focus ~ .input-icon,
+.input-group input:focus + .input-icon {
+  color: var(--accent-secondary);
+}
+
+/* When icon is before the input (sibling selector won't work), 
+   we handle it via parent focus-within */
+.input-group:focus-within .input-icon {
+  color: var(--accent-secondary);
+}
+
+/* Password toggle */
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  transition: color 0.3s var(--ease-smooth);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: var(--accent-secondary);
+}
+
+.input-group input[type="password"],
+.input-group .password-input {
+  padding-right: 48px;
+}
+
+/* ---- Submit Button ---- */
+.auth-submit {
+  width: 100%;
+  padding: 15px 24px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  box-shadow: var(--shadow-button);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-smooth);
+}
+
+.auth-submit:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: var(--shadow-button-hover);
+}
+
+.auth-submit:hover::before {
+  opacity: 1;
+}
+
+.auth-submit:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* ---- Divider ---- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 4px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.auth-divider span {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* ---- Footer Link ---- */
+.auth-footer {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  color: var(--accent-secondary);
+  font-weight: 500;
+  transition: all 0.3s var(--ease-smooth);
+  position: relative;
+}
+
+.auth-footer a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--gradient-primary);
+  transition: width 0.3s var(--ease-smooth);
+}
+
+.auth-footer a:hover::after {
+  width: 100%;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 36px 24px;
+    border-radius: 20px;
+    margin: 0 8px;
+  }
+
+  .auth-logo {
+    font-size: 28px;
+  }
+
+  .auth-title {
+    font-size: 20px;
+  }
+
+  .input-group input {
+    padding: 12px 14px 12px 44px;
+    font-size: 14px;
+  }
+
+  .auth-submit {
+    padding: 13px 20px;
+    font-size: 15px;
+  }
+
+  .profile-pic-placeholder {
+    width: 76px;
+    height: 76px;
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-card {
+    padding: 28px 18px;
+  }
+}
