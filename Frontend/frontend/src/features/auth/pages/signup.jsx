@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { 
-  HiOutlineUser, 
-  HiOutlineLockClosed, 
+import {
+  HiOutlineUser,
+  HiOutlineLockClosed,
   HiOutlineMail,
-  HiOutlineEye, 
+  HiOutlineEye,
   HiOutlineEyeOff,
   HiOutlineIdentification
 } from 'react-icons/hi'
 import { IoMusicalNotesOutline } from 'react-icons/io5'
 import { FiCamera } from 'react-icons/fi'
 import './auth.css'
-import { register } from '../api/auth.api'
+import useAuth from '../hooks/useAuth'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -44,53 +44,54 @@ const musicNotes = ['♪', '♫', '♬', '♩', '♪', '♫', '♬', '♩']
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    username: '',
-    email: '',
-    password: '',
-  })
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+  const { handleRegister, loading, error, handleClearError } = useAuth()
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    register(formData)
-      .then((data) => {
-        console.log('Sign up successful:', data)
-      })
-      .catch((error) => {
-        console.error('Sign up failed:', error)
-      })
-    console.log('Sign up:', formData)
+    handleRegister({ name, username, email, password })
   }
 
   return (
     <div className="auth-page">
-      {/* Animated Background */}
       <div className="auth-bg">
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>
         <div className="orb orb-3"></div>
       </div>
 
-      {/* Floating Music Notes */}
       <div className="floating-notes">
         {musicNotes.map((note, i) => (
           <span key={i} className="note">{note}</span>
         ))}
       </div>
 
-      {/* Auth Card */}
       <motion.div
         className="auth-card"
         variants={cardVariant}
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
         <motion.div
           className="auth-header"
           variants={fadeUp}
@@ -112,6 +113,17 @@ const SignUp = () => {
           <h1 className="auth-title">Create Account</h1>
         </motion.div>
 
+        {error && (
+          <motion.div
+            className="auth-error"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {error}
+          </motion.div>
+        )}
+
         {/* Profile Picture Placeholder */}
         <motion.div
           variants={fadeUp}
@@ -125,7 +137,6 @@ const SignUp = () => {
           <p className="profile-pic-label">Profile Picture</p>
         </motion.div>
 
-        {/* Form */}
         <form className="auth-form" onSubmit={handleSubmit}>
           <motion.div
             className="input-group"
@@ -140,8 +151,8 @@ const SignUp = () => {
               type="text"
               name="name"
               placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
+              value={name}
+              onChange={handleNameChange}
               autoComplete="name"
               required
             />
@@ -160,8 +171,8 @@ const SignUp = () => {
               type="text"
               name="username"
               placeholder="Username"
-              value={formData.username}
-              onChange={handleChange}
+              value={username}
+              onChange={handleUsernameChange}
               autoComplete="username"
               required
             />
@@ -180,8 +191,8 @@ const SignUp = () => {
               type="email"
               name="email"
               placeholder="Email Address"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={handleEmailChange}
               autoComplete="email"
               required
             />
@@ -201,8 +212,8 @@ const SignUp = () => {
               name="password"
               className="password-input"
               placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={handlePasswordChange}
               autoComplete="new-password"
               required
             />
@@ -216,6 +227,7 @@ const SignUp = () => {
             </button>
           </motion.div>
 
+          {/* CHANGED: Loading state on button */}
           <motion.button
             type="submit"
             className="auth-submit"
@@ -223,11 +235,13 @@ const SignUp = () => {
             initial="hidden"
             animate="visible"
             custom={6}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={!loading ? { scale: 1.02 } : {}}
+            whileTap={!loading ? { scale: 0.98 } : {}}
+            disabled={loading}
+            style={{ opacity: loading ? 0.7 : 1 }}
           >
             <IoMusicalNotesOutline style={{ marginRight: 8, fontSize: 18, verticalAlign: 'middle' }} />
-            Create Account
+            {loading ? 'Creating account...' : 'Create Account'}
           </motion.button>
         </form>
 

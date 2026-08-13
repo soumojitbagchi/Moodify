@@ -16,9 +16,9 @@ const login = async (credentials) => {
   }
 };
 
-const register = async (userData) => {
+const register = async ({ name, username, email, password }) => {
   try {
-    const response = await authApi.post("/register", userData);
+    const response = await authApi.post("/register", { name, username, email, password });
     return response.data;
   } catch (error) {
     throw error.response.data;
