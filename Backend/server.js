@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 import connectDB from "./src/config/connectDB.js";
 
 dotenv.config();
-app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
