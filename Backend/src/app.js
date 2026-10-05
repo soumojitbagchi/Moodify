@@ -1,6 +1,7 @@
 import express from "express";
 import authRouter from "./routes/auth.route.js";
 import songRoute from "./routes/song.route.js";
+import moodRouter from "./routes/mood.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { notFound, errorHandler } from "./middleware/error.middleware.js";
@@ -18,6 +19,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ success: true, message: "OK", uptime: process.uptime() });
 });
 
+app.use("/api/moods", moodRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/songs", songRoute);
 

@@ -15,6 +15,7 @@ async function fetchNewToken() {
 
   const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
+    signal: AbortSignal.timeout(10000),
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       grant_type: "client_credentials",

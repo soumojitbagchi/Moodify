@@ -3,12 +3,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import asyncHandler from "../utils/asyncHandler.js";
 
-const TOKEN_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
-const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 const signToken = (user) =>
   jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-    expiresIn: TOKEN_EXPIRES_IN,
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   });
 
 const setTokenCookie = (res, token) => {
@@ -48,7 +47,6 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
   const token = signToken(newUser);
   setTokenCookie(res, token);
-  // Keep `token` in JSON for backward compat with existing frontend (localStorage flow).
   res.status(201).json({
     token,
     success: true,

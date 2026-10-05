@@ -5,6 +5,7 @@ import { getSpotifyAccessToken } from "../service/accessToken.service.js";
 const spotifyFetch = async (path, token) => {
   const response = await fetch(`https://api.spotify.com/v1${path}`, {
     headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) {
     const text = await response.text().catch(() => "");
@@ -13,16 +14,10 @@ const spotifyFetch = async (path, token) => {
   return response.json();
 };
 
-// GET /api/songs/token — returns a fresh (cached) app token for the frontend dev flow.
-const getToken = asyncHandler(async (req, res) => {
-  const accessToken = req.spotifyToken || (await getSpotifyAccessToken());
-  res.status(200).json({ success: true, accessToken });
-});
-
 // GET /api/songs/search?q=<query>&limit=<1-50>&type=track
 // Proxies Spotify search so the client secret never leaves the backend.
 const searchTracks = asyncHandler(async (req, res) => {
-  const q = req.query.q?.trim();
+  const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
   if (!q) {
     throw new ApiError(400, "Query param 'q' is required, e.g. /api/songs/search?q=happy");
   }
@@ -49,7 +44,7 @@ const MOOD_QUERIES = {
 
 const getByMood = asyncHandler(async (req, res) => {
   const mood = req.params.mood?.toLowerCase().trim();
-  const query = MOOD_QUERIES[mood];
+  const query = Object.hasOwn(MOOD_QUERIES, mood) ? MOOD_QUERIES[mood] : null;
   if (!query) {
     throw new ApiError(
       400,
@@ -65,4 +60,4 @@ const getByMood = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, mood, data });
 });
 
-export default { getToken, searchTracks, getByMood };
+export default { searchTracks, getByMood };
