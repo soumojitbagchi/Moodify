@@ -1,46 +1,102 @@
 import userData from "../model/userSchema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import asyncHandler from "../utils/asyncHandler.js";
 
-export const registerUser = async (req, res) => {
-  try {
-    const { name, email, password, username } = req.body;
-    const existingUser = await userData.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+const TOKEN_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+const signToken = (user) =>
+  jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: TOKEN_EXPIRES_IN,
+  });
 
-    const newUser = await userData.create({
-      name,
-      email,
-      password: hashedPassword,
-      username,
-    });
-    const token = jwt.sign({ id: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.status(201).json({ token: token, success: true, message: "User registered successfully" });
-  } catch (error) {
-    console.error("Error registering user:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-}
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password, username } = req.body;
-    const user = await userData.findOne({ $or: [{ email }, { username }] });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.status(200).json({ token: token, success: true, message: "User logged in successfully" });
-  } catch (error) {
-    console.error("Error logging in user:", error);
-    res.status(500).json({ message: "Server error" });
-  }
+const setTokenCookie = (res, token) => {
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: COOKIE_MAX_AGE,
+  });
 };
+
+const toPublicUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  username: user.username,
+  email: user.email,
+  profilePicture: user.profilePicture,
+});
+
+export const registerUser = asyncHandler(async (req, res) => {
+  let { name, email, password, username } = req.body;
+  email = email?.toLowerCase().trim();
+  username = username?.trim();
+
+  const existingUser = await userData.findOne({ $or: [{ email }, { username }] });
+  if (existingUser) {
+    return res.status(409).json({ success: false, message: "User already exists" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await userData.create({
+    name: name.trim(),
+    email,
+    password: hashedPassword,
+    username,
+  });
+  const token = signToken(newUser);
+  setTokenCookie(res, token);
+  // Keep `token` in JSON for backward compat with existing frontend (localStorage flow).
+  res.status(201).json({
+    token,
+    success: true,
+    message: "User registered successfully",
+    user: toPublicUser(newUser),
+  });
+});
+
+export const loginUser = asyncHandler(async (req, res) => {
+  let { email, password, username } = req.body;
+  email = email?.toLowerCase().trim();
+  username = username?.trim();
+
+  // Allow login with either email or username; require at least one identifier.
+  const orConditions = [];
+  if (email) orConditions.push({ email });
+  if (username) orConditions.push({ username });
+  if (orConditions.length === 0) {
+    return res.status(400).json({ success: false, message: "Email or username is required" });
+  }
+
+  const user = await userData.findOne({ $or: orConditions });
+  if (!user) {
+    return res.status(401).json({ success: false, message: "Invalid credentials" });
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ success: false, message: "Invalid credentials" });
+  }
+  const token = signToken(user);
+  setTokenCookie(res, token);
+  res.status(200).json({
+    token,
+    success: true,
+    message: "User logged in successfully",
+    user: toPublicUser(user),
+  });
+});
+
+export const logoutUser = asyncHandler(async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+  res.status(200).json({ success: true, message: "Logged out successfully" });
+});
+
+export const getMe = asyncHandler(async (req, res) => {
+  res.status(200).json({ success: true, user: toPublicUser(req.user) });
+});
