@@ -1,28 +1,11 @@
-import axios from "axios";
+import { request } from '../../../api'
 
-const authApi = axios.create({
-  baseURL: "http://localhost:8080/api/auth",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+export const login = (credentials) =>
+  request('/auth/login', { method: 'POST', body: credentials })
 
-const login = async (credentials) => {
-  try {
-    const response = await authApi.post("/login", credentials);
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
+export const register = (credentials) =>
+  request('/auth/register', { method: 'POST', body: credentials })
 
-const register = async ({ name, username, email, password }) => {
-  try {
-    const response = await authApi.post("/register", { name, username, email, password });
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
+export const getMe = (signal) => request('/auth/me', { signal })
 
-export { login, register };
+export const signOut = () => request('/auth/logout', { method: 'POST' })

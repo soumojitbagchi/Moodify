@@ -5,10 +5,10 @@
 
 :root {
   /* Core palette */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-card: rgba(18, 18, 30, 0.6);
-  --bg-input: rgba(25, 25, 45, 0.7);
+  --bg-primary: #111113;
+  --bg-secondary: #19191d;
+  --bg-card: #19191d;
+  --bg-input: #232329;
 
   /* Accent colors */
   --accent-primary: #8b5cf6;
@@ -23,14 +23,14 @@
 
   /* Text */
   --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  --text-secondary: #aaaab5;
+  --text-muted: #9696a3;
   --text-accent: #a78bfa;
 
   /* Borders */
-  --border-subtle: rgba(139, 92, 246, 0.15);
-  --border-glow: rgba(139, 92, 246, 0.3);
-  --border-input: rgba(139, 92, 246, 0.2);
+  --border-subtle: #2c2c33;
+  --border-glow: #a78bfa;
+  --border-input: #45454f;
 
   /* Shadows */
   --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 80px rgba(139, 92, 246, 0.06);
@@ -103,4 +103,23 @@ a:hover {
 ::selection {
   background: rgba(139, 92, 246, 0.3);
   color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-tertiary);
+  outline-offset: 4px;
+}
+
+button:disabled { cursor: wait; opacity: .65; }
+
+.skip-link { position: fixed; top: -100px; left: 16px; z-index: 10; background: var(--accent-tertiary); color: var(--bg-primary); padding: 12px; border-radius: 6px; }
+.skip-link:focus { top: 16px; }
+
+.not-found { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 24px; padding: 32px; text-align: center; }
+.not-found h1 { font-size: clamp(32px, 5vw, 56px); letter-spacing: -1px; }
+.not-found > p { color: var(--text-secondary); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

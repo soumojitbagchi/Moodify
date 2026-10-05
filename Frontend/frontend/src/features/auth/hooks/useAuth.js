@@ -1,93 +1,56 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
-import { login, register } from "../api/auth.api";
-
-import {
-  setLoading,
-  setUserInfo,
-  setIsAuthenticated,
-  setToken,
-  setError,
-  clearError,
-} from "../../../redux/slice/userSlice.redux";
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { login, register, signOut } from '../api/auth.api'
+import { setLoading, setUserInfo, setIsAuthenticated, setToken, setError, clearError, logout } from '../../../redux/slice/userSlice.redux'
 
 const useAuth = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const state = useSelector((state) => state.user)
 
-  const navigate = useNavigate();
+  useEffect(() => { dispatch(clearError()) }, [dispatch])
 
-  const loading = useSelector((state) => state.user.loading);
-
-  const error = useSelector((state) => state.user.error);
-
-  const token = useSelector((state) => state.user.token);
-
-  const userInfo = useSelector((state) => state.user.userInfo);
-
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-
-  const handleLogin = async ({ usernameOrEmail, password }) => {
+  const authenticate = async (api, credentials) => {
+    dispatch(clearError())
+    dispatch(setLoading(true))
     try {
-      dispatch(clearError());
-      dispatch(setLoading(true));
-
-      // Detect if user typed an email or a username
-      const isEmail = usernameOrEmail.includes("@");
-      const credentials = isEmail
-        ? { email: usernameOrEmail, password }
-        : { username: usernameOrEmail, password };
-
-      const data = await login(credentials);
-      dispatch(setToken(data.token));
-      dispatch(setIsAuthenticated(true));
-
-      navigate("/");
-
-    } catch (err) {
-      dispatch(
-        setError(
-          err?.message || err?.error || "Login failed. Please try again."
-        )
-      );
+      const data = await api(credentials)
+      dispatch(setUserInfo(data.user))
+      dispatch(setToken(data.token))
+      dispatch(setIsAuthenticated(true))
+      navigate('/', { replace: true })
+    } catch (error) {
+      dispatch(setError(error.message))
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoading(false))
     }
-  };
-  const handleRegister = async ({ name, username, email, password }) => {
+  }
+
+  const handleLogin = ({ usernameOrEmail, password }) => {
+    const identifier = usernameOrEmail.trim()
+    return authenticate(login, identifier.includes('@')
+      ? { email: identifier, password }
+      : { username: identifier, password })
+  }
+
+  const handleRegister = ({ name, username, email, password }) =>
+    authenticate(register, { name: name.trim(), username: username.trim(), email: email.trim(), password })
+
+  const handleLogout = async () => {
+    dispatch(clearError())
+    dispatch(setLoading(true))
     try {
-      dispatch(clearError());
-      dispatch(setLoading(true));
-
-      const data = await register({ name, username, email, password });
-      navigate("/signin");
-      console.log("Registration successful:", data);
-
-    } catch (err) {
-      dispatch(
-        setError(
-          err?.message || err?.error || "Registration failed. Please try again."
-        )
-      );
+      await signOut()
+      dispatch(logout())
+    } catch (error) {
+      dispatch(setError(error.message))
     } finally {
-      dispatch(setLoading(false));
+      dispatch(setLoading(false))
     }
-  };
+  }
 
-  const handleClearError = () => {
-    dispatch(clearError());
-  };
-  return {
-    handleLogin,
-    handleRegister,
-    handleClearError,
+  return { ...state, handleLogin, handleRegister, handleLogout, handleClearError: () => dispatch(clearError()) }
+}
 
-    loading,
-    error,
-    token,
-    userInfo,
-    isAuthenticated,
-  };
-};
-
-export default useAuth;
+export default useAuth

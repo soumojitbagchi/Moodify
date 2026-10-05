@@ -6,12 +6,16 @@ const userSlice = createSlice({
   initialState: {
     userInfo: null,        // Will hold { name, username, email } after login
     isAuthenticated: false, // true = user is logged in, false = not
+    sessionLoading: true,
     loading: false,         // true = an API call is in progress
     token: null,            // JWT token from backend after successful login
     error: null,            // Error message string if login/register fails
   },
 
   reducers: {
+    setSessionLoading: (state, action) => {
+      state.sessionLoading = action.payload;
+    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -46,6 +50,7 @@ const userSlice = createSlice({
 });
 
 export const {
+  setSessionLoading,
   setUserInfo,
   setIsAuthenticated,
   setLoading,

@@ -1,203 +1,51 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import {
-    HiOutlineUser,
-    HiOutlineLockClosed,
-    HiOutlineEye,
-    HiOutlineEyeOff
-} from 'react-icons/hi'
-import { IoMusicalNotesOutline } from 'react-icons/io5'
-import './auth.css'
+import { useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
+import { FiArrowLeft, FiArrowRight, FiEye, FiEyeOff, FiHeadphones } from 'react-icons/fi'
 import useAuth from '../hooks/useAuth'
-
-const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i) => ({
-        opacity: 1,
-        y: 0,
-        transition: {
-            delay: i * 0.1,
-            duration: 0.6,
-            ease: [0.4, 0, 0.2, 1],
-        },
-    }),
-}
-
-const cardVariant = {
-    hidden: { opacity: 0, y: 40, scale: 0.96 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: {
-            duration: 0.7,
-            ease: [0.4, 0, 0.2, 1],
-        },
-    },
-}
-
-const musicNotes = ['♪', '♫', '♬', '♩', '♪', '♫', '♬', '♩']
+import './auth.css'
 
 const SignIn = () => {
-    const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({ usernameOrEmail: '', password: '' })
+  const { handleLogin, loading, sessionLoading, error, isAuthenticated, handleClearError } = useAuth()
 
-    const [formData, setFormData] = useState({
-        usernameOrEmail: '',
-        password: '',
-    })
-    const { handleLogin, loading, error, handleClearError } = useAuth()
+  if (isAuthenticated) return <Navigate to="/" replace />
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleChange = (event) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value })
+    if (error) handleClearError()
+  }
 
-        if (error) {
-            handleClearError()
-        }
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        handleLogin(formData)
-    }
-
-    return (
-        <div className="auth-page">
-            {/* Animated Background */}
-            <div className="auth-bg">
-                <div className="orb orb-1"></div>
-                <div className="orb orb-2"></div>
-                <div className="orb orb-3"></div>
+  return (
+    <main className="auth-page">
+      <div className="auth-shell">
+        <Link className="auth-back" to="/"><FiArrowLeft aria-hidden="true" /> Back to discovering</Link>
+        <div className="auth-card">
+          <Link className="auth-brand" to="/"><FiHeadphones aria-hidden="true" /> Moodify.</Link>
+          <p className="auth-kicker">Your next soundtrack starts here</p>
+          <h1 className="auth-title">Welcome back.</h1>
+          <p className="auth-subtitle">Sign in and find a little more of your rhythm.</p>
+          {error && <div className="auth-error" role="alert">{error}</div>}
+          <form className="auth-form" onSubmit={(event) => { event.preventDefault(); handleLogin(formData) }} aria-busy={loading}>
+            <div className="auth-field">
+              <label htmlFor="signin-username">Username or email</label>
+              <input id="signin-username" name="usernameOrEmail" value={formData.usernameOrEmail} onChange={handleChange} autoComplete="username" placeholder="you@example.com" required maxLength={254} disabled={loading} />
             </div>
-
-            {/* Floating Music Notes */}
-            <div className="floating-notes">
-                {musicNotes.map((note, i) => (
-                    <span key={i} className="note">{note}</span>
-                ))}
+            <div className="auth-field">
+              <label htmlFor="signin-password">Password</label>
+              <div className="password-field">
+                <input id="signin-password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} autoComplete="current-password" placeholder="Your password" required disabled={loading} />
+                <button type="button" className="password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword}>{showPassword ? <FiEyeOff aria-hidden="true" /> : <FiEye aria-hidden="true" />}</button>
+              </div>
             </div>
-
-            {/* Auth Card */}
-            <motion.div
-                className="auth-card"
-                variants={cardVariant}
-                initial="hidden"
-                animate="visible"
-            >
-                {/* Header */}
-                <motion.div
-                    className="auth-header"
-                    variants={fadeUp}
-                    initial="hidden"
-                    animate="visible"
-                    custom={0}
-                >
-                    <div className="equalizer">
-                        <div className="bar"></div>
-                        <div className="bar"></div>
-                        <div className="bar"></div>
-                        <div className="bar"></div>
-                        <div className="bar"></div>
-                        <div className="bar"></div>
-                        <div className="bar"></div>
-                    </div>
-                    <div className="auth-logo">Moodify</div>
-                    <p className="auth-subtitle">Music that matches your mood</p>
-                    <h1 className="auth-title">Welcome Back</h1>
-                </motion.div>
-                {error && (
-                    <motion.div
-                        className="auth-error"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {error}
-                    </motion.div>
-                )}
-
-                {/* Form */}
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    <motion.div
-                        className="input-group"
-                        variants={fadeUp}
-                        initial="hidden"
-                        animate="visible"
-                        custom={1}
-                    >
-                        <HiOutlineUser className="input-icon" />
-                        <input
-                            id="signin-username"
-                            type="text"
-                            name="usernameOrEmail"
-                            placeholder="Username or Email"
-                            value={formData.usernameOrEmail}
-                            onChange={handleChange}
-                            autoComplete="username"
-                            required
-                        />
-                    </motion.div>
-
-                    <motion.div
-                        className="input-group"
-                        variants={fadeUp}
-                        initial="hidden"
-                        animate="visible"
-                        custom={2}
-                    >
-                        <HiOutlineLockClosed className="input-icon" />
-                        <input
-                            id="signin-password"
-                            type={showPassword ? 'text' : 'password'}
-                            name="password"
-                            className="password-input"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            autoComplete="current-password"
-                            required
-                        />
-                        <button
-                            type="button"
-                            className="password-toggle"
-                            onClick={() => setShowPassword(!showPassword)}
-                            aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        >
-                            {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-                        </button>
-                    </motion.div>
-
-                    <motion.button
-                        type="submit"
-                        className="auth-submit"
-                        variants={fadeUp}
-                        initial="hidden"
-                        animate="visible"
-                        custom={3}
-                        whileHover={!loading ? { scale: 1.02 } : {}}
-                        whileTap={!loading ? { scale: 0.98 } : {}}
-                        disabled={loading}
-                        style={{ opacity: loading ? 0.7 : 1 }}
-                    >
-                        <IoMusicalNotesOutline style={{ marginRight: 8, fontSize: 18, verticalAlign: 'middle' }} />
-                        {loading ? 'Signing in...' : 'Sign In'}
-                    </motion.button>
-                </form>
-
-                {/* Footer */}
-                <motion.div
-                    className="auth-footer"
-                    variants={fadeUp}
-                    initial="hidden"
-                    animate="visible"
-                    custom={4}
-                >
-                    Don't have an account?{' '}
-                    <Link to="/signup">Sign Up</Link>
-                </motion.div>
-            </motion.div>
+            <button type="submit" className="auth-submit" disabled={loading || sessionLoading}>{loading ? 'Signing in…' : sessionLoading ? 'Checking session…' : 'Sign in'}<FiArrowRight aria-hidden="true" /></button>
+          </form>
+          <p className="auth-footer">New around here? <Link to="/signup">Create an account</Link></p>
         </div>
-    )
+        <p className="auth-footnote">Not ready to sign in? <Link to="/">Explore as a guest.</Link></p>
+      </div>
+    </main>
+  )
 }
 
 export default SignIn
