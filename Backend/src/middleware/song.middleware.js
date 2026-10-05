@@ -1,25 +1,17 @@
-async function getSpotifyToken() {
-    const endpoint = "https://accounts.spotify.com/api/token";
+import { getSpotifyAccessToken } from "../service/accessToken.service.js";
 
-    const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-            grant_type: "client_credentials",
-            client_id: process.env.SPOTIFY_CLIENT_ID,
-            client_secret: process.env.SPOTIFY_CLIENT_SECRET,
-        }),
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to fetch Spotify token");
-    }
-
-    const data = await response.json();
-    req.access_token = data.access_token;
+// Attaches a valid Spotify app token as req.spotifyToken for downstream handlers.
+async function ensureSpotifyToken(req, res, next) {
+  try {
+    req.spotifyToken = await getSpotifyAccessToken();
+    next();
+  } catch (error) {
+    next(error);
+  }
 }
 
-export { getSpotifyToken }
-//todo : connect with frontend n then see which error we get and where i need to improve 
+// Back-compat alias: previous route used `getSpotifyToken`.
+const getSpotifyToken = ensureSpotifyToken;
+
+export { ensureSpotifyToken, getSpotifyToken };
+export default { ensureSpotifyToken, getSpotifyToken };
